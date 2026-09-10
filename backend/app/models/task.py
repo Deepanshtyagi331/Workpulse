@@ -53,6 +53,17 @@ class Task(Base, TimestampMixin):
         cascade="all, delete-orphan",
         order_by="Note.created_at.desc()",
     )
+    history = relationship(
+        "TaskHistory",
+        back_populates="task",
+        cascade="all, delete-orphan",
+        order_by="TaskHistory.created_at.desc()",
+    )
+    attachments = relationship(
+        "Attachment",
+        back_populates="task",
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         return f"<Task(id={self.id}, title='{self.title[:30]}', status='{self.status}', priority='{self.priority}')>"

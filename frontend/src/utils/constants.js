@@ -6,6 +6,7 @@ export const APP_TAGLINE = "Internal Task & Management Dashboard";
 export const NAV_ITEMS = [
   { id: "dashboard", label: "Dashboard", icon: "LayoutDashboard", path: "/dashboard" },
   { id: "tasks", label: "Tasks", icon: "CheckSquare", path: "/tasks" },
+  { id: "kanban", label: "Kanban", icon: "Columns3", path: "/kanban" },
   { id: "users", label: "Team Members", icon: "Users", path: "/users" },
   { id: "integrations", label: "Integrations", icon: "Plug", path: "/integrations" },
 ];

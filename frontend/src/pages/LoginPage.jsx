@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Eye, EyeOff, Zap, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from '../components/common/ThemeToggle';
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -39,7 +40,12 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-slate-100 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 flex items-center justify-center p-4 relative transition-colors">
+      {/* Theme Toggle in top-right */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle id="login-theme-toggle" />
+      </div>
+
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
@@ -52,27 +58,27 @@ export function LoginPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/30 mb-4">
             <Zap className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">WorkPulse</h1>
-          <p className="text-slate-400 mt-1 text-sm">Internal Task &amp; Management Dashboard</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">WorkPulse</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Internal Task &amp; Management Dashboard</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-xl font-semibold text-white mb-1">Welcome back</h2>
-          <p className="text-slate-400 text-sm mb-6">Sign in to your account to continue.</p>
+        <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-8 shadow-xl dark:shadow-2xl">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">Welcome back</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Sign in to your account to continue.</p>
 
           {/* Error message */}
           {error && (
-            <div className="flex items-start gap-2.5 p-3 mb-5 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-              <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
-              <p className="text-rose-300 text-sm">{error}</p>
+            <div className="flex items-start gap-2.5 p-3 mb-5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl">
+              <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 mt-0.5 shrink-0" />
+              <p className="text-rose-700 dark:text-rose-300 text-sm font-medium">{error}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Email */}
             <div>
-              <label htmlFor="login-email" className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label htmlFor="login-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Email address
               </label>
               <input
@@ -85,13 +91,13 @@ export function LoginPage() {
                 required
                 disabled={loading}
                 placeholder="alex.rivera@workpulse.internal"
-                className="w-full px-3.5 py-2.5 bg-white/8 border border-white/15 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all disabled:opacity-50"
+                className="w-full px-3.5 py-2.5 bg-white dark:bg-white/8 border border-slate-300 dark:border-white/15 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="login-password" className="block text-xs font-medium text-slate-300 mb-1.5">
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
                 Password
               </label>
               <div className="relative">
@@ -105,12 +111,12 @@ export function LoginPage() {
                   required
                   disabled={loading}
                   placeholder="••••••••"
-                  className="w-full px-3.5 py-2.5 bg-white/8 border border-white/15 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all disabled:opacity-50 pr-10"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-white/8 border border-slate-300 dark:border-white/15 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all disabled:opacity-50 pr-10"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                   tabIndex={-1}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
@@ -138,11 +144,11 @@ export function LoginPage() {
           </form>
 
           {/* Register link */}
-          <p className="mt-5 text-center text-sm text-slate-400">
+          <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
             Don&apos;t have an account?{' '}
             <Link
               to="/register"
-              className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors"
             >
               Create account
             </Link>
@@ -150,11 +156,11 @@ export function LoginPage() {
         </div>
 
         {/* Dev hint */}
-        <div className="mt-4 p-3 bg-white/5 border border-white/10 rounded-xl text-center">
-          <p className="text-xs text-slate-500">
-            <span className="text-slate-400 font-medium">Dev credentials:</span>{' '}
+        <div className="mt-4 p-3 bg-slate-100/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center">
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            <span className="text-slate-700 dark:text-slate-300 font-medium">Dev credentials:</span>{' '}
             any seeded user &nbsp;·&nbsp; password:{' '}
-            <span className="font-mono text-slate-300">WorkPulse2024!</span>
+            <span className="font-mono text-slate-800 dark:text-slate-200">WorkPulse2024!</span>
           </p>
         </div>
       </div>

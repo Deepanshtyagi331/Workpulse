@@ -11,6 +11,7 @@ import {
   AlertTriangle,
   CheckCircle2,
   RefreshCw,
+  History,
   FolderTree,
   Shield,
 } from 'lucide-react';
@@ -26,10 +27,14 @@ import ErrorState from '../components/feedback/ErrorState';
 import TaskForm from '../components/tasks/TaskForm';
 import CommentForm from '../components/tasks/CommentForm';
 import CommentItem from '../components/tasks/CommentItem';
+import HistoryTimeline from '../components/tasks/HistoryTimeline';
+import AttachmentSection from '../components/tasks/AttachmentSection';
+import Pagination from '../components/common/Pagination';
 
 import taskService from '../services/taskService';
 import commentService from '../services/commentService';
 import { useAuth } from '../context/AuthContext';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 export function TaskDetailsPage() {
   const { id } = useParams();
@@ -44,6 +49,12 @@ export function TaskDetailsPage() {
   const [taskError, setTaskError] = useState(null);
   const [commentsError, setCommentsError] = useState(null);
   const [is404, setIs404] = useState(false);
+
+  const [historyItems, setHistoryItems] = useState([]);
+  const [historyMeta, setHistoryMeta] = useState({ page: 1, limit: 10, total: 0, total_pages: 1 });
+  const [historyPage, setHistoryPage] = useState(1);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+  const [historyError, setHistoryError] = useState(null);
 
   // Notifications & Modals
   const [notification, setNotification] = useState(null);
@@ -94,10 +105,125 @@ export function TaskDetailsPage() {
     }
   }, [id]);
 
+  const fetchHistory = useCallback(async (page = 1) => {
+    setLoadingHistory(true);
+    setHistoryError(null);
+    try {
+      const res = await taskService.getHistory(id, { page, limit: 10 });
+      setHistoryItems(res.items || []);
+      setHistoryMeta({
+        page: res.page || page,
+        limit: res.limit || 10,
+        total: res.total || 0,
+        total_pages: res.total_pages || 1,
+      });
+      setHistoryPage(res.page || page);
+    } catch (err) {
+      setHistoryError(err.message || 'Failed to load task history.');
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, [id]);
+
   useEffect(() => {
     fetchTask();
     fetchComments();
-  }, [fetchTask, fetchComments]);
+    fetchHistory(1);
+  }, [fetchTask, fetchComments, fetchHistory]);
+
+  // Real-time WebSocket event listeners for this task
+  const { subscribe } = useWebSocket();
+  const [taskDeletedExternally, setTaskDeletedExternally] = useState(false);
+
+  useEffect(() => {
+    const currentTaskId = Number(id);
+
+    // Task Updated / Status Changed / Priority Changed
+    const unsubTaskUpdate = subscribe('task.updated', (event) => {
+      if (event.entity_id === currentTaskId || event.data?.id === currentTaskId) {
+        setTask((prev) => (prev ? { ...prev, ...event.data } : prev));
+        fetchHistory(1);
+      }
+    });
+
+    const unsubStatusChange = subscribe('task.status_changed', (event) => {
+      if (event.entity_id === currentTaskId || event.data?.id === currentTaskId) {
+        setTask((prev) => (prev ? { ...prev, ...event.data } : prev));
+        fetchHistory(1);
+      }
+    });
+
+    const unsubPriorityChange = subscribe('task.priority_changed', (event) => {
+      if (event.entity_id === currentTaskId || event.data?.id === currentTaskId) {
+        setTask((prev) => (prev ? { ...prev, ...event.data } : prev));
+        fetchHistory(1);
+      }
+    });
+
+    const unsubAssigneeChange = subscribe('task.assignee_changed', (event) => {
+      if (event.entity_id === currentTaskId || event.data?.id === currentTaskId) {
+        setTask((prev) => (prev ? { ...prev, ...event.data } : prev));
+        fetchHistory(1);
+      }
+    });
+
+    // Task Deleted
+    const unsubTaskDelete = subscribe('task.deleted', (event) => {
+      if (event.entity_id === currentTaskId || event.data?.id === currentTaskId) {
+        setTaskDeletedExternally(true);
+      }
+    });
+
+    // Comment Created / Updated / Deleted
+    const unsubCommentCreate = subscribe('comment.created', (event) => {
+      if (event.data?.task_id === currentTaskId) {
+        setComments((prev) => {
+          if (prev.some((c) => c.id === event.data.id)) return prev;
+          return [...prev, event.data];
+        });
+      }
+    });
+
+    const unsubCommentUpdate = subscribe('comment.updated', (event) => {
+      if (event.data?.task_id === currentTaskId) {
+        setComments((prev) =>
+          prev.map((c) => (c.id === event.data.id ? { ...c, ...event.data } : c))
+        );
+      }
+    });
+
+    const unsubCommentDelete = subscribe('comment.deleted', (event) => {
+      if (event.data?.task_id === currentTaskId) {
+        setComments((prev) => prev.filter((c) => c.id !== event.entity_id));
+      }
+    });
+
+    // Attachment Uploaded / Deleted
+    const unsubAttachmentUpload = subscribe('attachment.uploaded', (event) => {
+      if (event.data?.task_id === currentTaskId) {
+        fetchHistory(1);
+      }
+    });
+
+    const unsubAttachmentDelete = subscribe('attachment.deleted', (event) => {
+      if (event.data?.task_id === currentTaskId) {
+        fetchHistory(1);
+      }
+    });
+
+    return () => {
+      unsubTaskUpdate();
+      unsubStatusChange();
+      unsubPriorityChange();
+      unsubAssigneeChange();
+      unsubTaskDelete();
+      unsubCommentCreate();
+      unsubCommentUpdate();
+      unsubCommentDelete();
+      unsubAttachmentUpload();
+      unsubAttachmentDelete();
+    };
+  }, [id, subscribe, fetchHistory]);
 
   // Overdue Logic: due_date < now AND status != 'completed'
   const isOverdue = Boolean(
@@ -115,6 +241,7 @@ export function TaskDetailsPage() {
       setTask(updated);
       setIsEditModalOpen(false);
       showToast('Task updated successfully!');
+      fetchHistory(1);
     } catch (err) {
       setFormError(err.message || 'Failed to update task.');
     } finally {
@@ -180,6 +307,28 @@ export function TaskDetailsPage() {
     return (
       <div className="py-24 max-w-4xl mx-auto">
         <LoadingSpinner size="lg" label={`Loading Task #${id}...`} />
+      </div>
+    );
+  }
+
+  // 1b. Real-time External Deletion State
+  if (taskDeletedExternally) {
+    return (
+      <div className="py-16 max-w-xl mx-auto text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/40 flex items-center justify-center text-rose-500 mx-auto border border-rose-200 dark:border-rose-900/50">
+          <Trash2 className="w-6 h-6 text-rose-600 dark:text-rose-400" />
+        </div>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">This Task Has Been Deleted</h2>
+        <p className="text-sm text-slate-500 dark:text-slate-400">
+          Task #{id} was deleted by another team member in real-time.
+        </p>
+        <div className="pt-2">
+          <Link to="/tasks">
+            <Button variant="primary" size="md" icon={ArrowLeft}>
+              Back to Tasks
+            </Button>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -381,6 +530,78 @@ export function TaskDetailsPage() {
                 </div>
               )}
             </div>
+          </Card>
+
+          <Card
+            title="Attachments"
+            subtitle="Files associated with this task"
+            headerBorder={true}
+          >
+            <AttachmentSection
+              taskId={task.id}
+              canUpload={isAdmin || isManager || (isEmployee && task.assigned_to === user?.id)}
+              canDeleteAttachment={(attachment) => {
+                if (isAdmin || isManager) return true;
+                return (
+                  isEmployee &&
+                  task.assigned_to === user?.id &&
+                  attachment.uploaded_by?.id === user?.id
+                );
+              }}
+              onChanged={() => fetchHistory(1)}
+              onNotify={showToast}
+            />
+          </Card>
+
+          <Card
+            title="History"
+            subtitle="Who changed this task, and what changed"
+            headerBorder={true}
+            action={
+              <button
+                type="button"
+                onClick={() => fetchHistory(historyPage)}
+                className="text-xs text-slate-400 hover:text-indigo-600 inline-flex items-center gap-1 transition-colors"
+                title="Refresh history"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Refresh</span>
+              </button>
+            }
+          >
+            {loadingHistory ? (
+              <div className="py-8">
+                <LoadingSpinner label="Loading history..." />
+              </div>
+            ) : historyError ? (
+              <ErrorState
+                title="Unable to load history"
+                message={historyError}
+                onRetry={() => fetchHistory(historyPage)}
+                className="p-6"
+              />
+            ) : historyItems.length === 0 ? (
+              <EmptyState
+                icon={History}
+                title="No history yet"
+                description="Changes to this task will appear here as an audit trail."
+                className="p-8 shadow-none"
+              />
+            ) : (
+              <div className="min-w-0 space-y-4 overflow-x-hidden">
+                <HistoryTimeline items={historyItems} />
+                {historyMeta.total_pages > 1 && (
+                  <Pagination
+                    currentPage={historyMeta.page}
+                    totalPages={historyMeta.total_pages}
+                    totalItems={historyMeta.total}
+                    limit={historyMeta.limit}
+                    onPageChange={(page) => fetchHistory(page)}
+                    disabled={loadingHistory}
+                  />
+                )}
+              </div>
+            )}
           </Card>
         </div>
 

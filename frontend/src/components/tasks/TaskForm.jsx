@@ -88,7 +88,7 @@ export function TaskForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {submitError && (
-        <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700">
+        <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-700 dark:text-rose-300">
           {submitError}
         </div>
       )}
@@ -107,7 +107,7 @@ export function TaskForm({
 
       {/* Description */}
       <div className="w-full space-y-1.5 text-left">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
           Description
         </label>
         <textarea
@@ -117,10 +117,10 @@ export function TaskForm({
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           disabled={loading}
-          className="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100"
+          className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100 dark:disabled:bg-slate-900"
         />
         {fieldErrors.description && (
-          <p className="text-xs text-rose-600 font-medium">{fieldErrors.description}</p>
+          <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">{fieldErrors.description}</p>
         )}
       </div>
 
@@ -174,14 +174,14 @@ export function TaskForm({
             disabled={loading || loadingUsers || isEmployee}
           />
           {isEmployee && (
-            <p className="text-[10px] text-slate-400 mt-1">
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">
               Employees cannot reassign tasks to other team members.
             </p>
           )}
         </div>
 
         <div className="w-full space-y-1.5 text-left">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
             Due Date & Time
           </label>
           <input
@@ -190,13 +190,13 @@ export function TaskForm({
             value={formData.due_date}
             onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
             disabled={loading}
-            className="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100"
+            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100 dark:disabled:bg-slate-900"
           />
         </div>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700/60">
         <Button
           type="button"
           variant="secondary"

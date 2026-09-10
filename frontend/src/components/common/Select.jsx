@@ -22,7 +22,7 @@ export function Select({
       {label && (
         <label
           htmlFor={selectId}
-          className="block text-xs font-semibold uppercase tracking-wider text-slate-700"
+          className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300"
         >
           {label} {required && <span className="text-rose-500">*</span>}
         </label>
@@ -36,15 +36,15 @@ export function Select({
           onChange={onChange}
           disabled={disabled}
           required={required}
-          className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500 ${
+          className={`block w-full rounded-lg border bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:text-slate-500 dark:disabled:text-slate-500 ${
             error
-              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20'
-              : 'border-slate-300'
+              ? 'border-rose-300 dark:border-rose-500 focus:border-rose-500 focus:ring-rose-500/20'
+              : 'border-slate-300 dark:border-slate-600'
           } ${className}`}
           {...props}
         >
           {placeholder && (
-            <option value="" disabled className="text-slate-400">
+            <option value="" disabled className="text-slate-400 dark:text-slate-500">
               {placeholder}
             </option>
           )}
@@ -52,7 +52,7 @@ export function Select({
             const val = typeof opt === 'object' ? opt.value : opt;
             const text = typeof opt === 'object' ? opt.label : opt;
             return (
-              <option key={val} value={val}>
+              <option key={val} value={val} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
                 {text}
               </option>
             );
@@ -61,9 +61,9 @@ export function Select({
       </div>
 
       {error ? (
-        <p className="text-xs text-rose-600 font-medium">{error}</p>
+        <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">{error}</p>
       ) : helperText ? (
-        <p className="text-xs text-slate-500">{helperText}</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{helperText}</p>
       ) : null}
     </div>
   );

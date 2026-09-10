@@ -14,6 +14,7 @@ from app.routes.comments import router as comments_router
 from app.routes.dashboard import router as dashboard_router
 from app.routes.stats import router as stats_router
 from app.routes.integrations import router as integrations_router
+from app.routes.attachments import router as attachments_router
 from app.routes.auth import router as auth_router
 from app.utilities.logger import logger
 
@@ -54,6 +55,8 @@ app = FastAPI(
         {"name": "Users Management", "description": "Operations to manage internal team members."},
         {"name": "Task Management", "description": "Operations to create, filter, sort, update, and manage tasks."},
         {"name": "Comments / Notes", "description": "Operations to manage comments and notes on tasks."},
+        {"name": "Task History", "description": "Audit log of task create, update, and delete events."},
+        {"name": "Attachments", "description": "Upload, list, download, and delete task file attachments."},
         {"name": "Dashboard Statistics", "description": "Aggregated metrics, charts, and activity feeds."},
         {"name": "External Integrations", "description": "Upstream third-party integration pipelines."},
     ],
@@ -102,15 +105,16 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 # ─── Direct /api alias routes ─────────────────────────────────────────────────
 app.include_router(users_router, prefix="/api/users", tags=["Users Management"])
 app.include_router(tasks_router, prefix="/api/tasks", tags=["Task Management"])
+app.include_router(attachments_router, prefix="/api/attachments", tags=["Attachments"])
 app.include_router(comments_router, prefix="/api", tags=["Comments / Notes"])
 app.include_router(dashboard_router, prefix="/api/dashboard", tags=["Dashboard Statistics"])
 app.include_router(stats_router, prefix="/api/stats", tags=["Dashboard Statistics"])
 app.include_router(integrations_router, prefix="/api/integrations", tags=["External Integrations"])
 
+from app.routes.websocket import router as websocket_router
+app.include_router(websocket_router, prefix="/api", tags=["WebSockets"])
+app.include_router(websocket_router, prefix=settings.API_V1_STR, tags=["WebSockets"], include_in_schema=False)
 
-
-
-# ─── Health check routes ──────────────────────────────────────────────────────
 from app.routes.health import router as health_router
 app.include_router(health_router, prefix="/api", tags=["System Health"])
 app.include_router(health_router, tags=["System Health"], include_in_schema=False)

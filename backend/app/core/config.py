@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 8  # 8 hours default for local dev
 
+    MAX_UPLOAD_SIZE_MB: int = 10
+    UPLOAD_DIR: str = "uploads"
+
     @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:

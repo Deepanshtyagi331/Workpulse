@@ -36,6 +36,28 @@ export const taskService = {
   deleteTask(id) {
     return apiClient.delete(`/tasks/${id}`);
   },
+
+  getHistory(taskId, params = {}) {
+    return apiClient.get(`/tasks/${taskId}/history`, { params });
+  },
+
+  /**
+   * Loads every matching task across pages (Kanban has no pagination UI).
+   * Reuses getTasks so filters/search stay consistent with the Tasks table.
+   */
+  async getAllTasks(params = {}) {
+    const limit = 100;
+    const first = await this.getTasks({ ...params, page: 1, limit });
+    const items = [...(first.items || [])];
+    const totalPages = first.total_pages || 1;
+
+    for (let page = 2; page <= totalPages; page += 1) {
+      const res = await this.getTasks({ ...params, page, limit });
+      items.push(...(res.items || []));
+    }
+
+    return items;
+  },
 };
 
 export default taskService;

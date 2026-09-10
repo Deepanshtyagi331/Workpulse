@@ -85,6 +85,12 @@ export const NAVIGATION_ITEMS = [
     description: 'Workflow management & queue',
   },
   {
+    name: 'Kanban',
+    path: '/kanban',
+    icon: 'Columns3',
+    description: 'Status board with drag-and-drop',
+  },
+  {
     name: 'Users',
     path: '/users',
     icon: 'Users',
@@ -96,4 +102,11 @@ export const NAVIGATION_ITEMS = [
     icon: 'Plug',
     description: 'External API connectors & sync',
   },
+];
+
+export const KANBAN_COLUMNS = [
+  TASK_STATUS.PENDING,
+  TASK_STATUS.IN_PROGRESS,
+  TASK_STATUS.BLOCKED,
+  TASK_STATUS.COMPLETED,
 ];

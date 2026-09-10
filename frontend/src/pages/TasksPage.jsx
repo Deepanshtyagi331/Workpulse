@@ -33,6 +33,7 @@ import TaskForm from '../components/tasks/TaskForm';
 import taskService from '../services/taskService';
 import userService from '../services/userService';
 import { useAuth } from '../context/AuthContext';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 const SORT_OPTIONS = [
   { value: 'created_at:desc', label: 'Newest First (Created)' },
@@ -152,6 +153,63 @@ export function TasksPage() {
       setLoading(false);
     }
   }, [searchTerm, statusFilter, priorityFilter, assigneeFilter, sortKey, currentPage]);
+
+  // Real-time WebSocket event subscription
+  const { subscribe } = useWebSocket();
+  useEffect(() => {
+    const unsubCreate = subscribe('task.created', () => {
+      fetchTasks(currentPage);
+    });
+
+    const unsubUpdate = subscribe('task.updated', (event) => {
+      if (!event.data?.id) return;
+      setTasks((prev) =>
+        prev.map((t) => (t.id === event.data.id ? { ...t, ...event.data } : t))
+      );
+    });
+
+    const unsubStatus = subscribe('task.status_changed', (event) => {
+      if (!event.data?.id) return;
+      if (statusFilter && event.data.status !== statusFilter) {
+        // Task no longer belongs to filtered view
+        fetchTasks(currentPage);
+      } else {
+        setTasks((prev) =>
+          prev.map((t) => (t.id === event.data.id ? { ...t, ...event.data } : t))
+        );
+      }
+    });
+
+    const unsubPriority = subscribe('task.priority_changed', (event) => {
+      if (!event.data?.id) return;
+      setTasks((prev) =>
+        prev.map((t) => (t.id === event.data.id ? { ...t, ...event.data } : t))
+      );
+    });
+
+    const unsubAssignee = subscribe('task.assignee_changed', (event) => {
+      if (!event.data?.id) return;
+      fetchTasks(currentPage);
+    });
+
+    const unsubDelete = subscribe('task.deleted', (event) => {
+      if (!event.entity_id) return;
+      setTasks((prev) => prev.filter((t) => t.id !== event.entity_id));
+      setPagination((prev) => ({
+        ...prev,
+        total: Math.max(0, prev.total - 1),
+      }));
+    });
+
+    return () => {
+      unsubCreate();
+      unsubUpdate();
+      unsubStatus();
+      unsubPriority();
+      unsubAssignee();
+      unsubDelete();
+    };
+  }, [subscribe, fetchTasks, currentPage, statusFilter]);
 
   // Trigger fetch when search or filters change with debounce for text input
   useEffect(() => {

@@ -46,17 +46,17 @@ export function Modal({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${SIZES[size]} rounded-2xl bg-white text-left shadow-2xl border border-slate-200 overflow-hidden transform transition-all z-10`}
+        className={`relative w-full ${SIZES[size]} rounded-2xl bg-white dark:bg-slate-800 text-left shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transform transition-all z-10`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-6 py-4">
           <div>
-            <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
-            {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
+            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{title}</h3>
+            {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
             <X className="h-5 w-5" />
             <span className="sr-only">Close</span>
@@ -64,11 +64,11 @@ export function Modal({
         </div>
 
         {/* Body */}
-        <div className="px-6 py-4">{children}</div>
+        <div className="px-6 py-4 text-slate-700 dark:text-slate-200">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-3.5">
+          <div className="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-900/60 px-6 py-3.5">
             {footer}
           </div>
         )}

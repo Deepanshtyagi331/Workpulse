@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Zap, AlertCircle, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import ThemeToggle from '../components/common/ThemeToggle';
 
 const DEPARTMENTS = [
   'Engineering',
@@ -91,14 +92,19 @@ export function RegisterPage() {
   };
 
   const fieldClass = (name) =>
-    `w-full px-3.5 py-2.5 bg-white/8 border rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
+    `w-full px-3.5 py-2.5 bg-white dark:bg-white/8 border rounded-xl text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:outline-none focus:ring-2 transition-all disabled:opacity-50 ${
       errors[name]
-        ? 'border-rose-500/50 focus:ring-rose-500/30'
-        : 'border-white/15 focus:ring-indigo-500/50 focus:border-indigo-500/50'
+        ? 'border-rose-300 dark:border-rose-500/50 focus:ring-rose-500/30'
+        : 'border-slate-300 dark:border-white/15 focus:ring-indigo-500/50 focus:border-indigo-500'
     }`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/40 to-slate-100 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 flex items-center justify-center p-4 relative transition-colors">
+      {/* Theme Toggle in top-right */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle id="register-theme-toggle" />
+      </div>
+
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-violet-600/10 rounded-full blur-3xl" />
@@ -111,28 +117,28 @@ export function RegisterPage() {
           <div className="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/30 mb-4">
             <Zap className="w-7 h-7 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white tracking-tight">WorkPulse</h1>
-          <p className="text-slate-400 mt-1 text-sm">Create your account</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">WorkPulse</h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Create your account</p>
         </div>
 
         {/* Card */}
-        <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl">
-          <h2 className="text-xl font-semibold text-white mb-1">Join the team</h2>
-          <p className="text-slate-400 text-sm mb-6">Fill in your details to create an account.</p>
+        <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl p-8 shadow-xl dark:shadow-2xl">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-1">Join the team</h2>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-6">Fill in your details to create an account.</p>
 
           {/* API error */}
           {apiError && (
-            <div className="flex items-start gap-2.5 p-3 mb-5 bg-rose-500/10 border border-rose-500/20 rounded-xl">
-              <AlertCircle className="w-4 h-4 text-rose-400 mt-0.5 shrink-0" />
-              <p className="text-rose-300 text-sm">{apiError}</p>
+            <div className="flex items-start gap-2.5 p-3 mb-5 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl">
+              <AlertCircle className="w-4 h-4 text-rose-500 dark:text-rose-400 mt-0.5 shrink-0" />
+              <p className="text-rose-700 dark:text-rose-300 text-sm font-medium">{apiError}</p>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {/* Full Name */}
             <div>
-              <label htmlFor="reg-name" className="block text-xs font-medium text-slate-300 mb-1.5">
-                Full Name <span className="text-rose-400">*</span>
+              <label htmlFor="reg-name" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Full Name <span className="text-rose-500">*</span>
               </label>
               <input
                 id="reg-name"
@@ -145,13 +151,13 @@ export function RegisterPage() {
                 placeholder="Alex Rivera"
                 className={fieldClass('name')}
               />
-              {errors.name && <p className="text-rose-400 text-xs mt-1">{errors.name}</p>}
+              {errors.name && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1 font-medium">{errors.name}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label htmlFor="reg-email" className="block text-xs font-medium text-slate-300 mb-1.5">
-                Email Address <span className="text-rose-400">*</span>
+              <label htmlFor="reg-email" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Email Address <span className="text-rose-500">*</span>
               </label>
               <input
                 id="reg-email"
@@ -164,13 +170,13 @@ export function RegisterPage() {
                 placeholder="you@workpulse.internal"
                 className={fieldClass('email')}
               />
-              {errors.email && <p className="text-rose-400 text-xs mt-1">{errors.email}</p>}
+              {errors.email && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1 font-medium">{errors.email}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label htmlFor="reg-password" className="block text-xs font-medium text-slate-300 mb-1.5">
-                Password <span className="text-rose-400">*</span>
+              <label htmlFor="reg-password" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Password <span className="text-rose-500">*</span>
               </label>
               <div className="relative">
                 <input
@@ -187,16 +193,16 @@ export function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                   tabIndex={-1}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && <p className="text-rose-400 text-xs mt-1">{errors.password}</p>}
+              {errors.password && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1 font-medium">{errors.password}</p>}
               {form.password.length >= 8 && !errors.password && (
-                <p className="text-emerald-400 text-xs mt-1 flex items-center gap-1">
+                <p className="text-emerald-600 dark:text-emerald-400 text-xs mt-1 flex items-center gap-1 font-medium">
                   <CheckCircle2 className="w-3 h-3" /> Looks good
                 </p>
               )}
@@ -204,8 +210,8 @@ export function RegisterPage() {
 
             {/* Department */}
             <div>
-              <label htmlFor="reg-department" className="block text-xs font-medium text-slate-300 mb-1.5">
-                Department <span className="text-rose-400">*</span>
+              <label htmlFor="reg-department" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Department <span className="text-rose-500">*</span>
               </label>
               <select
                 id="reg-department"
@@ -215,18 +221,18 @@ export function RegisterPage() {
                 disabled={loading}
                 className={`${fieldClass('department')} appearance-none`}
               >
-                <option value="" disabled>Select a department</option>
+                <option value="" disabled className="text-slate-400">Select a department</option>
                 {DEPARTMENTS.map((d) => (
-                  <option key={d} value={d} className="bg-slate-800 text-white">{d}</option>
+                  <option key={d} value={d} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">{d}</option>
                 ))}
               </select>
-              {errors.department && <p className="text-rose-400 text-xs mt-1">{errors.department}</p>}
+              {errors.department && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1 font-medium">{errors.department}</p>}
             </div>
 
             {/* Role */}
             <div>
-              <label htmlFor="reg-role" className="block text-xs font-medium text-slate-300 mb-1.5">
-                Role <span className="text-rose-400">*</span>
+              <label htmlFor="reg-role" className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                Role <span className="text-rose-500">*</span>
               </label>
               <select
                 id="reg-role"
@@ -236,12 +242,12 @@ export function RegisterPage() {
                 disabled={loading}
                 className={`${fieldClass('role')} appearance-none`}
               >
-                <option value="" disabled>Select a role</option>
+                <option value="" disabled className="text-slate-400">Select a role</option>
                 {ROLES.map((r) => (
-                  <option key={r} value={r} className="bg-slate-800 text-white">{r}</option>
+                  <option key={r} value={r} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">{r}</option>
                 ))}
               </select>
-              {errors.role && <p className="text-rose-400 text-xs mt-1">{errors.role}</p>}
+              {errors.role && <p className="text-rose-600 dark:text-rose-400 text-xs mt-1 font-medium">{errors.role}</p>}
             </div>
 
             {/* Submit */}
@@ -262,9 +268,9 @@ export function RegisterPage() {
             </button>
           </form>
 
-          <p className="mt-5 text-center text-sm text-slate-400">
+          <p className="mt-5 text-center text-sm text-slate-500 dark:text-slate-400">
             Already have an account?{' '}
-            <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+            <Link to="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 font-medium transition-colors">
               Sign in
             </Link>
           </p>

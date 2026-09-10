@@ -19,6 +19,7 @@ from app.database.session import Base, engine, SessionLocal
 from app.models.user import User
 from app.models.task import Task, TaskStatus, TaskPriority
 from app.models.note import Note
+from app.models.task_history import TaskHistory, HistoryAction
 from app.core.security import hash_password
 
 # Development seed password — NOT a production credential
@@ -386,11 +387,93 @@ def seed_database():
         print(f"✓ Seeded {len(notes_data)} comments/notes across multiple tasks.")
 
         # -------------------------------------------------------------------------
+        # 4. Seed a small, deterministic audit trail for demonstration
+        # -------------------------------------------------------------------------
+        sarah = user_objects["Sarah Chen"]
+        alex = user_objects["Alex Rivera"]
+        priya = user_objects["Priya Patel"]
+        task_list = list(db.query(Task).order_by(Task.id.asc()).all())
+        t1 = task_list[0]
+        t2 = task_list[1]
+        t8 = task_list[7] if len(task_list) > 7 else task_list[0]
+
+        history_rows = [
+            TaskHistory(
+                task_id=t1.id,
+                user_id=sarah.id,
+                action=HistoryAction.CREATED.value,
+                field_name=None,
+                old_value=None,
+                new_value=t1.title,
+                created_at=now - timedelta(days=10),
+            ),
+            TaskHistory(
+                task_id=t1.id,
+                user_id=alex.id,
+                action=HistoryAction.STATUS_CHANGED.value,
+                field_name="status",
+                old_value="pending",
+                new_value="in_progress",
+                created_at=now - timedelta(days=8),
+            ),
+            TaskHistory(
+                task_id=t1.id,
+                user_id=sarah.id,
+                action=HistoryAction.PRIORITY_CHANGED.value,
+                field_name="priority",
+                old_value="high",
+                new_value="urgent",
+                created_at=now - timedelta(days=3),
+            ),
+            TaskHistory(
+                task_id=t2.id,
+                user_id=priya.id,
+                action=HistoryAction.CREATED.value,
+                field_name=None,
+                old_value=None,
+                new_value=t2.title,
+                created_at=now - timedelta(days=6),
+            ),
+            TaskHistory(
+                task_id=t2.id,
+                user_id=alex.id,
+                action=HistoryAction.ASSIGNEE_CHANGED.value,
+                field_name="assigned_to",
+                old_value=str(sarah.id),
+                new_value=str(user_objects["Marcus Vance"].id),
+                created_at=now - timedelta(days=4),
+            ),
+            TaskHistory(
+                task_id=t8.id,
+                user_id=sarah.id,
+                action=HistoryAction.CREATED.value,
+                field_name=None,
+                old_value=None,
+                new_value=t8.title,
+                created_at=now - timedelta(days=5),
+            ),
+            TaskHistory(
+                task_id=t8.id,
+                user_id=alex.id,
+                action=HistoryAction.STATUS_CHANGED.value,
+                field_name="status",
+                old_value="in_progress",
+                new_value="pending",
+                created_at=now - timedelta(days=1),
+            ),
+        ]
+        for row in history_rows:
+            db.add(row)
+        db.commit()
+        print(f"✓ Seeded {len(history_rows)} task history entries.")
+
+        # -------------------------------------------------------------------------
         # Summary Report
         # -------------------------------------------------------------------------
         user_count = db.query(User).count()
         task_count = db.query(Task).count()
         note_count = db.query(Note).count()
+        history_count = db.query(TaskHistory).count()
         completed_count = db.query(Task).filter(Task.status == TaskStatus.COMPLETED.value).count()
         blocked_count = db.query(Task).filter(Task.status == TaskStatus.BLOCKED.value).count()
         in_progress_count = db.query(Task).filter(Task.status == TaskStatus.IN_PROGRESS.value).count()
@@ -408,6 +491,7 @@ def seed_database():
         print(f"  - Pending:     {pending_count}")
         print(f"  - Overdue:     {overdue_count}")
         print(f"Notes/Comments: {note_count}")
+        print(f"Task history:   {history_count}")
         print("=" * 50 + "\n")
 
     except Exception as e:

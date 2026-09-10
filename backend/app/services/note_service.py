@@ -7,6 +7,7 @@ from app.repositories.note_repository import NoteRepository
 from app.repositories.task_repository import TaskRepository
 from app.repositories.user_repository import UserRepository
 from app.schemas.comment import CommentCreate, CommentUpdate, CommentResponse
+from app.websocket.manager import manager, create_ws_event
 
 
 class NoteService:
@@ -51,7 +52,7 @@ class NoteService:
 
     def create_comment_for_task(self, task_id: int, comment_in: CommentCreate) -> Note:
         """
-        Validates task and author existence before creating a comment.
+        Validates task and author existence before creating a comment, then broadcasts event.
         """
         task = self.task_repo.get_by_id(task_id)
         if not task:
@@ -73,10 +74,24 @@ class NoteService:
             "content": comment_in.content,
         }
         created_note = self.note_repo.create(note_data)
-        return self.note_repo.get_by_id_with_relations(created_note.id)
+        fresh_note = self.note_repo.get_by_id_with_relations(created_note.id)
+
+        # Broadcast comment.created
+        comment_data = CommentResponse.model_validate(fresh_note).model_dump(mode="json")
+        event = create_ws_event(
+            event_type="comment.created",
+            entity="comment",
+            action="created",
+            entity_id=fresh_note.id,
+            data=comment_data,
+            actor=author,
+        )
+        manager.broadcast_sync(event)
+
+        return fresh_note
 
     def update_comment(self, comment_id: int, comment_in: CommentUpdate) -> Note:
-        """Updates comment text content or raises HTTP 404."""
+        """Updates comment text content and broadcasts comment.updated."""
         comment = self.note_repo.get_by_id(comment_id)
         if not comment:
             raise HTTPException(
@@ -85,10 +100,24 @@ class NoteService:
             )
 
         updated_note = self.note_repo.update(comment, {"content": comment_in.content})
-        return self.note_repo.get_by_id_with_relations(updated_note.id)
+        fresh_note = self.note_repo.get_by_id_with_relations(updated_note.id)
+
+        # Broadcast comment.updated
+        comment_data = CommentResponse.model_validate(fresh_note).model_dump(mode="json")
+        event = create_ws_event(
+            event_type="comment.updated",
+            entity="comment",
+            action="updated",
+            entity_id=fresh_note.id,
+            data=comment_data,
+            actor=fresh_note.author,
+        )
+        manager.broadcast_sync(event)
+
+        return fresh_note
 
     def delete_comment(self, comment_id: int) -> CommentResponse:
-        """Deletes a comment or raises HTTP 404."""
+        """Deletes a comment and broadcasts comment.deleted."""
         comment = self.note_repo.get_by_id_with_relations(comment_id)
         if not comment:
             raise HTTPException(
@@ -96,7 +125,21 @@ class NoteService:
                 detail=f"Comment with ID {comment_id} not found",
             )
 
+        task_id = comment.task_id
+        author = comment.author
         # Pre-serialize to avoid SQLAlchemy DetachedInstanceError on author relation
         response = CommentResponse.model_validate(comment)
         self.note_repo.delete(comment.id)
+
+        # Broadcast comment.deleted
+        event = create_ws_event(
+            event_type="comment.deleted",
+            entity="comment",
+            action="deleted",
+            entity_id=comment_id,
+            data={"id": comment_id, "task_id": task_id},
+            actor=author,
+        )
+        manager.broadcast_sync(event)
+
         return response

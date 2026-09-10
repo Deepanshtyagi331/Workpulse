@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, or_
 from app.models.user import User
 from app.models.task import Task
+from app.models.task_history import TaskHistory
+from app.models.attachment import Attachment
 from app.repositories.base import BaseRepository
 
 
@@ -68,6 +70,14 @@ class UserRepository(BaseRepository[User]):
             # Set assigned_to to None on tasks assigned to this user
             self.db.query(Task).filter(Task.assigned_to == user_id).update(
                 {Task.assigned_to: None},
+                synchronize_session=False,
+            )
+            self.db.query(TaskHistory).filter(TaskHistory.user_id == user_id).update(
+                {TaskHistory.user_id: None},
+                synchronize_session=False,
+            )
+            self.db.query(Attachment).filter(Attachment.uploaded_by == user_id).update(
+                {Attachment.uploaded_by: None},
                 synchronize_session=False,
             )
             self.db.delete(user)

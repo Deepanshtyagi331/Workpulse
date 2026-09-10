@@ -105,8 +105,8 @@ export function UserForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {submitError && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-800 animate-in fade-in duration-150">
-          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-800 dark:text-rose-300 animate-in fade-in duration-150">
+          <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" />
           <span className="font-medium">{submitError}</span>
         </div>
       )}
@@ -176,7 +176,7 @@ export function UserForm({
           options={isAdmin ? ROLE_OPTIONS_FOR_ADMIN : ROLE_OPTIONS_FOR_MANAGER}
           disabled={loading}
         />
-        <p className="text-[11px] text-slate-400 mt-1">
+        <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-1">
           {isAdmin
             ? 'Admins can assign employee, manager, or admin permissions.'
             : 'Managers can create users with employee permissions.'}
@@ -185,11 +185,11 @@ export function UserForm({
 
       {/* Status Toggle */}
       <div className="pt-1">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-2">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
           Initial Status
         </label>
         <div className="flex items-center gap-4">
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300">
             <input
               type="radio"
               name="is_active"
@@ -200,7 +200,7 @@ export function UserForm({
             />
             <span>Active</span>
           </label>
-          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700">
+          <label className="flex items-center gap-2 cursor-pointer text-sm font-medium text-slate-700 dark:text-slate-300">
             <input
               type="radio"
               name="is_active"
@@ -215,7 +215,7 @@ export function UserForm({
       </div>
 
       {/* Form Action Buttons */}
-      <div className="pt-4 border-t border-slate-100 flex items-center justify-end gap-3">
+      <div className="pt-4 border-t border-slate-100 dark:border-slate-700/60 flex items-center justify-end gap-3">
         <Button
           type="button"
           variant="secondary"

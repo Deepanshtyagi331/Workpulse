@@ -10,10 +10,10 @@ export function Table({
   onRowClick,
 }) {
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
       <div className="overflow-x-auto">
-        <table className={`min-w-full divide-y divide-slate-200 text-left text-sm ${className}`}>
-          <thead className="bg-slate-50/80 text-xs font-semibold uppercase tracking-wider text-slate-600">
+        <table className={`min-w-full divide-y divide-slate-200 dark:divide-slate-700 text-left text-sm ${className}`}>
+          <thead className="bg-slate-50/80 dark:bg-slate-900/80 text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
             <tr>
               {columns.map((col, idx) => (
                 <th
@@ -26,19 +26,19 @@ export function Table({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white text-slate-700">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
             {isLoading ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500">
+                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <Loader2 className="h-6 w-6 animate-spin text-indigo-600" />
+                    <Loader2 className="h-6 w-6 animate-spin text-indigo-600 dark:text-indigo-400" />
                     <span className="text-xs font-medium">Loading data...</span>
                   </div>
                 </td>
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500">
+                <td colSpan={columns.length} className="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
                   <p className="text-sm">{emptyMessage}</p>
                 </td>
               </tr>
@@ -47,7 +47,7 @@ export function Table({
                 <tr
                   key={row.id || rowIdx}
                   onClick={() => onRowClick && onRowClick(row)}
-                  className={`transition-colors hover:bg-slate-50/80 ${
+                  className={`transition-colors hover:bg-slate-50/80 dark:hover:bg-slate-700/50 ${
                     onRowClick ? 'cursor-pointer' : ''
                   }`}
                 >

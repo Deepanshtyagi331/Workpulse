@@ -14,8 +14,12 @@ from app.dependencies import get_current_user
 from app.dependencies.rbac import require_admin_or_manager
 from app.core.roles import UserAppRole
 from app.models.user import User
+from app.routes.task_history import router as history_router
+from app.routes.attachments import task_attachments_router
 
 router = APIRouter()
+router.include_router(history_router)
+router.include_router(task_attachments_router)
 
 
 def get_task_service(db: Session = Depends(get_db)) -> TaskService:
@@ -90,7 +94,7 @@ def create_task(
     service: TaskService = Depends(get_task_service),
     current_user: User = Depends(require_admin_or_manager),
 ):
-    return service.create_task(task_in)
+    return service.create_task(task_in, actor=current_user)
 
 
 # ---------------------------------------------------------------------------
@@ -125,7 +129,7 @@ def update_task(
                 detail="Employees cannot reassign tasks.",
             )
 
-    return service.update_task(task_id, task_in)
+    return service.update_task(task_id, task_in, actor=current_user)
 
 
 # ---------------------------------------------------------------------------
@@ -142,4 +146,4 @@ def delete_task(
     service: TaskService = Depends(get_task_service),
     current_user: User = Depends(require_admin_or_manager),
 ):
-    return service.delete_task(task_id)
+    return service.delete_task(task_id, actor=current_user)

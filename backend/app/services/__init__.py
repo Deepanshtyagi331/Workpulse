@@ -4,6 +4,7 @@ from app.services.external_api_service import ExternalApiService
 from app.services.task_service import TaskService
 from app.services.note_service import NoteService
 from app.services.dashboard_service import DashboardService
+from app.services.task_history_service import TaskHistoryService
 
-__all__ = ["UserService", "StatsService", "ExternalApiService", "TaskService", "NoteService", "DashboardService"]
+__all__ = ["UserService", "StatsService", "ExternalApiService", "TaskService", "NoteService", "DashboardService", "TaskHistoryService"]
 

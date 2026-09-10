@@ -12,13 +12,13 @@ export function EmptyState({
 }) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-slate-300 bg-white shadow-sm ${className}`}
+      className={`flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm ${className}`}
     >
-      <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 mb-4 shadow-inner">
+      <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-slate-400 dark:text-slate-400 mb-4 shadow-inner">
         <Icon className="w-6 h-6" />
       </div>
-      <h3 className="text-base font-semibold text-slate-900 tracking-tight">{title}</h3>
-      <p className="text-sm text-slate-500 max-w-sm mt-1.5 leading-relaxed">{description}</p>
+      <h3 className="text-base font-semibold text-slate-900 dark:text-white tracking-tight">{title}</h3>
+      <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mt-1.5 leading-relaxed">{description}</p>
       {actionLabel && onAction && (
         <div className="mt-5">
           <Button variant="primary" size="sm" onClick={onAction}>

@@ -46,16 +46,18 @@ export function CommentForm({ onSubmit, loading = false, placeholder = 'Write a 
               placeholder={placeholder}
               disabled={loading}
               maxLength={3000}
-              className={`block w-full rounded-xl border bg-white p-3 text-sm text-slate-900 placeholder-slate-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100 disabled:cursor-not-allowed ${
-                error ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500/20' : 'border-slate-300'
+              className={`block w-full rounded-xl border bg-white dark:bg-slate-800 p-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:cursor-not-allowed ${
+                error
+                  ? 'border-rose-300 dark:border-rose-800 focus:border-rose-500 focus:ring-rose-500/20'
+                  : 'border-slate-300 dark:border-slate-700'
               }`}
             />
           </div>
 
-          {error && <p className="text-xs text-rose-600 font-medium">{error}</p>}
+          {error && <p className="text-xs text-rose-600 dark:text-rose-400 font-medium">{error}</p>}
 
           <div className="flex items-center justify-between pt-1">
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500">
               {content.length}/3000 characters
             </span>
             <div className="flex items-center gap-2">

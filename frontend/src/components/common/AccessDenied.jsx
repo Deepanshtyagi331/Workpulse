@@ -13,20 +13,20 @@ export default function AccessDenied({ message, requiredRoles }) {
         <ShieldAlert className="w-8 h-8" />
       </div>
 
-      <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
-      <p className="text-slate-400 max-w-md mb-6">
+      <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Access Denied</h1>
+      <p className="text-slate-500 dark:text-slate-400 max-w-md mb-6">
         {message || "You don't have permission to view or perform actions on this resource."}
       </p>
 
       {requiredRoles && (
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700/60 text-xs text-slate-300 mb-8">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/60 text-xs text-slate-700 dark:text-slate-300 mb-8">
           <span>Required role:</span>
-          <span className="font-semibold text-rose-400 uppercase">
+          <span className="font-semibold text-rose-500 dark:text-rose-400 uppercase">
             {Array.isArray(requiredRoles) ? requiredRoles.join(' or ') : requiredRoles}
           </span>
-          <span className="text-slate-500">•</span>
+          <span className="text-slate-400 dark:text-slate-500">•</span>
           <span>Your role:</span>
-          <span className="font-semibold text-cyan-400 uppercase">
+          <span className="font-semibold text-cyan-600 dark:text-cyan-400 uppercase">
             {user?.app_role || 'None'}
           </span>
         </div>
@@ -35,7 +35,7 @@ export default function AccessDenied({ message, requiredRoles }) {
       <div className="flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-slate-300 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700/50 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Go Back

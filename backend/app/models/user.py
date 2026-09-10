@@ -23,6 +23,8 @@ class User(Base, TimestampMixin):
     # Relationships
     tasks = relationship("Task", back_populates="assignee")
     notes = relationship("Note", back_populates="author", cascade="all, delete-orphan")
+    task_history = relationship("TaskHistory", back_populates="user")
+    attachments = relationship("Attachment", back_populates="uploader")
 
     def __repr__(self) -> str:
         return f"<User(id={self.id}, name='{self.name}', app_role='{self.app_role}')>"

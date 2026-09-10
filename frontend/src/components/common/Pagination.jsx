@@ -16,20 +16,20 @@ export function Pagination({
 
   return (
     <div
-      className={`flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm text-sm text-slate-700 ${className}`}
+      className={`flex flex-col sm:flex-row items-center justify-between gap-4 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm text-sm text-slate-700 dark:text-slate-300 ${className}`}
     >
       {/* Items count summary */}
-      <div className="text-xs text-slate-500">
+      <div className="text-xs text-slate-500 dark:text-slate-400">
         {totalItems != null ? (
           <span>
-            Showing <strong className="text-slate-900 font-medium">{startItem}</strong> to{' '}
-            <strong className="text-slate-900 font-medium">{endItem}</strong> of{' '}
-            <strong className="text-slate-900 font-medium">{totalItems}</strong> results
+            Showing <strong className="text-slate-900 dark:text-white font-medium">{startItem}</strong> to{' '}
+            <strong className="text-slate-900 dark:text-white font-medium">{endItem}</strong> of{' '}
+            <strong className="text-slate-900 dark:text-white font-medium">{totalItems}</strong> results
           </span>
         ) : (
           <span>
-            Page <strong className="text-slate-900 font-medium">{currentPage}</strong> of{' '}
-            <strong className="text-slate-900 font-medium">{totalPages || 1}</strong>
+            Page <strong className="text-slate-900 dark:text-white font-medium">{currentPage}</strong> of{' '}
+            <strong className="text-slate-900 dark:text-white font-medium">{totalPages || 1}</strong>
           </span>
         )}
       </div>
@@ -46,7 +46,7 @@ export function Pagination({
           Previous
         </Button>
 
-        <span className="px-2 text-xs font-semibold text-slate-600">
+        <span className="px-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
           {currentPage} / {totalPages || 1}
         </span>
 

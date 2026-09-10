@@ -71,11 +71,11 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
   };
 
   return (
-    <div className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-200/90 shadow-sm transition-all hover:border-slate-300">
+    <div className="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-800/90 border border-slate-200/90 dark:border-slate-700/80 shadow-sm transition-all hover:border-slate-300 dark:hover:border-slate-600">
       {/* Author Avatar */}
       <div
         className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold shadow-sm mt-0.5 ${
-          isOwner ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-700'
+          isOwner ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
         }`}
       >
         {avatarInitials}
@@ -85,27 +85,27 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
         {/* Comment Header */}
         <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold text-slate-900">{authorName}</span>
-            <span className="text-[11px] text-slate-400">•</span>
-            <span className="text-[11px] text-slate-500">{authorRole}</span>
+            <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{authorName}</span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500">•</span>
+            <span className="text-[11px] text-slate-500 dark:text-slate-400">{authorRole}</span>
             {isOwner && (
-              <span className="px-1.5 py-0.2 text-[9px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 rounded">
+              <span className="px-1.5 py-0.2 text-[9px] font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded">
                 You
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-slate-400">
+          <div className="flex items-center gap-2 text-[11px] text-slate-400 dark:text-slate-500">
             <span>{formattedTime}</span>
-            {isEdited && <span className="italic text-slate-400">(edited)</span>}
+            {isEdited && <span className="italic text-slate-400 dark:text-slate-500">(edited)</span>}
 
             {/* Ownership / Admin Actions: Edit & Delete */}
             {(canEdit || canDelete) && !isEditing && (
-              <div className="flex items-center gap-1 ml-2 border-l border-slate-200 pl-2">
+              <div className="flex items-center gap-1 ml-2 border-l border-slate-200 dark:border-slate-700 pl-2">
                 {canEdit && (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="p-1 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                    className="p-1 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded transition-colors"
                     title="Edit comment"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
@@ -115,7 +115,7 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
                 {canDelete && (
                   <button
                     onClick={() => onDelete(comment)}
-                    className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                    className="p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 rounded transition-colors"
                     title="Delete comment"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -138,9 +138,9 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
                 if (error) setError(null);
               }}
               disabled={saving}
-              className="block w-full rounded-lg border border-slate-300 p-2.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
+              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-2.5 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600"
             />
-            {error && <p className="text-xs text-rose-600">{error}</p>}
+            {error && <p className="text-xs text-rose-600 dark:text-rose-400">{error}</p>}
             <div className="flex items-center justify-end gap-2">
               <Button
                 variant="secondary"
@@ -164,7 +164,7 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
             </div>
           </div>
         ) : (
-          <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
             {comment.content}
           </p>
         )}

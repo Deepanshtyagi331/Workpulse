@@ -19,6 +19,9 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -53,7 +56,10 @@ apiClient.interceptors.response.use(
       message = error.message;
     }
 
-    return Promise.reject(new Error(message));
+    const wrapped = new Error(message);
+    wrapped.status = error.response?.status ?? null;
+    wrapped.code = error.code || null;
+    return Promise.reject(wrapped);
   }
 );
 

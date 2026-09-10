@@ -27,6 +27,12 @@ ENV/
 *.db
 *.sqlite3
 
+# Local file attachments
+backend/uploads/*
+!backend/uploads/.gitkeep
+uploads/
+
+
 # Node / Frontend
 node_modules/
 dist/
