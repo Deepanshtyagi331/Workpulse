@@ -1,0 +1,44 @@
+"""
+Pydantic schemas for authentication: register, login, token response, current user.
+"""
+
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
+
+
+class RegisterRequest(BaseModel):
+    """Payload for new user registration."""
+
+    name: str = Field(..., min_length=1, max_length=100, description="Full name of the team member")
+    email: EmailStr = Field(..., description="Corporate email address (must be unique)")
+    password: str = Field(..., min_length=8, max_length=128, description="Plaintext password (min 8 chars)")
+    department: str = Field(default="Engineering", min_length=2, max_length=100)
+    role: str = Field(default="Member", min_length=2, max_length=50)
+
+
+class LoginRequest(BaseModel):
+    """Payload for user authentication."""
+
+    email: EmailStr = Field(..., description="Registered email address")
+    password: str = Field(..., min_length=1, description="Account password")
+
+
+class CurrentUserResponse(BaseModel):
+    """Safe user profile returned on authentication — never includes password fields."""
+
+    id: int
+    name: str
+    email: EmailStr
+    department: str
+    role: str
+    is_active: bool
+    avatarText: str = ""
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class TokenResponse(BaseModel):
+    """Response returned after successful login or registration."""
+
+    access_token: str
+    token_type: str = "bearer"
+    user: CurrentUserResponse
