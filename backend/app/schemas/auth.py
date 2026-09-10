@@ -18,12 +18,33 @@ class RegisterRequest(BaseModel):
     # Self-registration always yields employee; admins can promote via PUT /api/users/{id}
     app_role: str = Field(default=UserAppRole.EMPLOYEE.value, exclude=True)
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "Jane Doe",
+                "email": "jane.doe@example.com",
+                "password": "SecurePassword123!",
+                "department": "Engineering",
+                "role": "Software Engineer",
+            }
+        }
+    )
+
 
 class LoginRequest(BaseModel):
     """Payload for user authentication."""
 
     email: EmailStr = Field(..., description="Registered email address")
     password: str = Field(..., min_length=1, description="Account password")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "email": "alex.chen@workpulse.internal",
+                "password": "SamplePassword123!",
+            }
+        }
+    )
 
 
 class CurrentUserResponse(BaseModel):
@@ -38,7 +59,21 @@ class CurrentUserResponse(BaseModel):
     is_active: bool
     avatarText: str = ""
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "name": "Deepansh Tyagi",
+                "email": "tyagideepansh26@gmail.com",
+                "department": "Engineering",
+                "role": "Lead Architect",
+                "app_role": "admin",
+                "is_active": True,
+                "avatarText": "DT",
+            }
+        },
+    )
 
 
 class TokenResponse(BaseModel):
@@ -47,3 +82,22 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: CurrentUserResponse
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer",
+                "user": {
+                    "id": 1,
+                    "name": "Deepansh Tyagi",
+                    "email": "tyagideepansh26@gmail.com",
+                    "department": "Engineering",
+                    "role": "Lead Architect",
+                    "app_role": "admin",
+                    "is_active": True,
+                    "avatarText": "DT",
+                },
+            }
+        }
+    )

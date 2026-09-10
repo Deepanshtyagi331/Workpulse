@@ -35,6 +35,8 @@ async def lifespan(app: FastAPI):
     logger.info(f"Shutting down {settings.PROJECT_NAME}...")
 
 
+from fastapi.openapi.utils import get_openapi
+
 app = FastAPI(
     title=f"{settings.PROJECT_NAME} API",
     description=(
@@ -59,8 +61,36 @@ app = FastAPI(
         {"name": "Attachments", "description": "Upload, list, download, and delete task file attachments."},
         {"name": "Dashboard Statistics", "description": "Aggregated metrics, charts, and activity feeds."},
         {"name": "External Integrations", "description": "Upstream third-party integration pipelines."},
+        {"name": "WebSockets", "description": "Real-time bidirectional WebSocket events for tasks, comments, and attachments."},
     ],
 )
+
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    schema = get_openapi(
+        title=f"{settings.PROJECT_NAME} API",
+        version=settings.VERSION,
+        description=app.description,
+        routes=app.routes,
+        tags=app.openapi_tags,
+    )
+    schema.setdefault("components", {})
+    schema["components"]["securitySchemes"] = {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT",
+            "description": "Enter your JWT token in the format: Bearer <token>",
+        }
+    }
+    schema["security"] = [{"BearerAuth": []}]
+    app.openapi_schema = schema
+    return app.openapi_schema
+
+
+app.openapi = custom_openapi
 
 # Configure CORS for local development
 app.add_middleware(

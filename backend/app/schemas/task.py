@@ -63,7 +63,18 @@ class TaskBase(BaseModel):
 
 
 class TaskCreate(TaskBase):
-    pass
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "title": "Upgrade database migration runner",
+                "description": "Optimize alembic migrations for zero-downtime releases.",
+                "status": "in_progress",
+                "priority": "high",
+                "assigned_to": 1,
+                "due_date": "2026-09-30T18:00:00Z",
+            }
+        }
+    )
 
 
 class TaskUpdate(BaseModel):
@@ -96,6 +107,16 @@ class TaskUpdate(BaseModel):
         description="Updated due date",
     )
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "title": "Upgrade database migration runner (Reviewed)",
+                "status": "completed",
+                "priority": "urgent",
+            }
+        }
+    )
+
     @field_validator("status")
     @classmethod
     def validate_status(cls, v: Optional[str]) -> Optional[str]:
@@ -125,7 +146,29 @@ class TaskResponse(TaskBase):
     updated_at: datetime
     assignee: Optional[UserSummary] = None
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 42,
+                "title": "Upgrade database migration runner",
+                "description": "Optimize alembic migrations for zero-downtime releases.",
+                "status": "in_progress",
+                "priority": "high",
+                "assigned_to": 1,
+                "due_date": "2026-09-30T18:00:00Z",
+                "created_at": "2026-09-10T12:00:00Z",
+                "updated_at": "2026-09-10T12:30:00Z",
+                "assignee": {
+                    "id": 1,
+                    "name": "Deepansh Tyagi",
+                    "email": "tyagideepansh26@gmail.com",
+                    "role": "Lead Architect",
+                    "app_role": "admin",
+                },
+            }
+        },
+    )
 
 
 class TaskDetailResponse(TaskResponse):

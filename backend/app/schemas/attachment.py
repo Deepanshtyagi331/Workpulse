@@ -12,7 +12,25 @@ class AttachmentResponse(BaseModel):
     uploaded_by: Optional[UserSummary] = None
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "original_filename": "architecture_diagram.pdf",
+                "content_type": "application/pdf",
+                "file_size": 204800,
+                "created_at": "2026-09-10T12:00:00Z",
+                "uploaded_by": {
+                    "id": 1,
+                    "name": "Deepansh Tyagi",
+                    "email": "tyagideepansh26@gmail.com",
+                    "role": "Lead Architect",
+                    "app_role": "admin",
+                },
+            }
+        },
+    )
 
 
 class AttachmentPaginationResponse(BaseModel):

@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Query, status, BackgroundTasks, HTTPException
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.schemas.comment import (
@@ -9,6 +9,7 @@ from app.schemas.comment import (
     CommentPaginationResponse,
 )
 from app.services.note_service import NoteService
+from app.services.background_service import background_job_service
 from app.dependencies import get_current_user
 from app.models.user import User
 
@@ -59,16 +60,24 @@ def list_task_comments(
 def create_task_comment(
     task_id: int,
     comment_in: CommentUpdate,  # Only requires 'content' — author is from JWT
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     service: NoteService = Depends(get_note_service),
 ):
     """Create a comment, binding the author to the authenticated user."""
-    # Build a CommentCreate with the authenticated user's ID
     full_comment = CommentCreate(
         content=comment_in.content,
         user_id=current_user.id,
     )
-    return service.create_comment_for_task(task_id=task_id, comment_in=full_comment)
+    result = service.create_comment_for_task(task_id=task_id, comment_in=full_comment)
+    background_tasks.add_task(
+        background_job_service.process_comment_telemetry_job,
+        task_id=task_id,
+        comment_id=result.id,
+        author_id=current_user.id,
+        action="COMMENT_CREATED",
+    )
+    return result
 
 
 # -----------------------------------------------------------------------------
@@ -84,23 +93,30 @@ def create_task_comment(
 def update_comment(
     comment_id: int,
     comment_in: CommentUpdate,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     service: NoteService = Depends(get_note_service),
 ):
     comment = service.note_repo.get_by_id(comment_id)
     if not comment:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Comment with ID {comment_id} not found",
         )
     if current_user.app_role != "admin" and comment.user_id != current_user.id:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only edit your own comments.",
         )
-    return service.update_comment(comment_id=comment_id, comment_in=comment_in)
+    result = service.update_comment(comment_id=comment_id, comment_in=comment_in)
+    background_tasks.add_task(
+        background_job_service.process_comment_telemetry_job,
+        task_id=result.task_id,
+        comment_id=result.id,
+        author_id=current_user.id,
+        action="COMMENT_UPDATED",
+    )
+    return result
 
 
 @router.delete(
@@ -111,20 +127,28 @@ def update_comment(
 )
 def delete_comment(
     comment_id: int,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     service: NoteService = Depends(get_note_service),
 ):
     comment = service.note_repo.get_by_id(comment_id)
     if not comment:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Comment with ID {comment_id} not found",
         )
     if current_user.app_role != "admin" and comment.user_id != current_user.id:
-        from fastapi import HTTPException
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You can only delete your own comments.",
         )
-    return service.delete_comment(comment_id=comment_id)
+    task_id = comment.task_id
+    result = service.delete_comment(comment_id=comment_id)
+    background_tasks.add_task(
+        background_job_service.process_comment_telemetry_job,
+        task_id=task_id,
+        comment_id=comment_id,
+        author_id=current_user.id,
+        action="COMMENT_DELETED",
+    )
+    return result

@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import APIRouter, Depends, Query, HTTPException, status
+from fastapi import APIRouter, Depends, Query, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database.session import get_db
 from app.schemas.task import (
@@ -10,6 +10,7 @@ from app.schemas.task import (
     TaskPaginationResponse,
 )
 from app.services.task_service import TaskService
+from app.services.background_service import background_job_service
 from app.dependencies import get_current_user
 from app.dependencies.rbac import require_admin_or_manager
 from app.core.roles import UserAppRole
@@ -91,10 +92,21 @@ def get_task(
 )
 def create_task(
     task_in: TaskCreate,
+    background_tasks: BackgroundTasks,
     service: TaskService = Depends(get_task_service),
     current_user: User = Depends(require_admin_or_manager),
 ):
-    return service.create_task(task_in, actor=current_user)
+    result = service.create_task(task_in, actor=current_user)
+    background_tasks.add_task(
+        background_job_service.process_task_notification_job,
+        event_type="TASK_CREATED",
+        task_id=result.id,
+        task_title=result.title,
+        actor_id=current_user.id,
+        actor_name=current_user.name,
+        assigned_to_id=result.assigned_to,
+    )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -110,6 +122,7 @@ def create_task(
 def update_task(
     task_id: int,
     task_in: TaskUpdate,
+    background_tasks: BackgroundTasks,
     service: TaskService = Depends(get_task_service),
     current_user: User = Depends(get_current_user),
 ):
@@ -129,7 +142,17 @@ def update_task(
                 detail="Employees cannot reassign tasks.",
             )
 
-    return service.update_task(task_id, task_in, actor=current_user)
+    result = service.update_task(task_id, task_in, actor=current_user)
+    background_tasks.add_task(
+        background_job_service.process_task_notification_job,
+        event_type="TASK_UPDATED",
+        task_id=result.id,
+        task_title=result.title,
+        actor_id=current_user.id,
+        actor_name=current_user.name,
+        assigned_to_id=result.assigned_to,
+    )
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -143,7 +166,17 @@ def update_task(
 )
 def delete_task(
     task_id: int,
+    background_tasks: BackgroundTasks,
     service: TaskService = Depends(get_task_service),
     current_user: User = Depends(require_admin_or_manager),
 ):
-    return service.delete_task(task_id, actor=current_user)
+    result = service.delete_task(task_id, actor=current_user)
+    background_tasks.add_task(
+        background_job_service.process_task_notification_job,
+        event_type="TASK_DELETED",
+        task_id=task_id,
+        task_title=result.title if hasattr(result, "title") else f"Task #{task_id}",
+        actor_id=current_user.id,
+        actor_name=current_user.name,
+    )
+    return result

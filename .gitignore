@@ -26,6 +26,8 @@ venv/
 ENV/
 *.db
 *.sqlite3
+.coverage
+.pytest_cache/
 
 # Local file attachments
 backend/uploads/*

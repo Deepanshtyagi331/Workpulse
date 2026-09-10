@@ -16,7 +16,29 @@ class TaskHistoryResponse(BaseModel):
     user: Optional[UserSummary] = None
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 101,
+                "task_id": 42,
+                "action": "status_changed",
+                "field_name": "status",
+                "old_value": "pending",
+                "new_value": "in_progress",
+                "old_display": "Pending",
+                "new_display": "In Progress",
+                "created_at": "2026-09-10T12:05:00Z",
+                "user": {
+                    "id": 1,
+                    "name": "Deepansh Tyagi",
+                    "email": "tyagideepansh26@gmail.com",
+                    "role": "Lead Architect",
+                    "app_role": "admin",
+                },
+            }
+        },
+    )
 
 
 class TaskHistoryPaginationResponse(BaseModel):

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Query, UploadFile, status, BackgroundTasks
 from sqlalchemy.orm import Session
 
 from app.database.session import get_db
@@ -6,6 +6,7 @@ from app.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.attachment import AttachmentPaginationResponse, AttachmentResponse
 from app.services.attachment_service import AttachmentService
+from app.services.background_service import background_job_service
 
 task_attachments_router = APIRouter()
 router = APIRouter()
@@ -38,11 +39,21 @@ def list_task_attachments(
 )
 async def upload_task_attachment(
     task_id: int,
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
     service: AttachmentService = Depends(get_attachment_service),
 ):
-    return await service.upload(task_id=task_id, upload=file, actor=current_user)
+    result = await service.upload(task_id=task_id, upload=file, actor=current_user)
+    background_tasks.add_task(
+        background_job_service.process_attachment_audit_job,
+        action="ATTACHMENT_UPLOADED",
+        attachment_id=result.id,
+        task_id=task_id,
+        filename=result.original_filename,
+        file_size=result.file_size,
+    )
+    return result
 
 
 @router.get(
@@ -64,7 +75,17 @@ def download_attachment(
 )
 def delete_attachment(
     attachment_id: int,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     service: AttachmentService = Depends(get_attachment_service),
 ):
-    return service.delete(attachment_id=attachment_id, actor=current_user)
+    result = service.delete(attachment_id=attachment_id, actor=current_user)
+    background_tasks.add_task(
+        background_job_service.process_attachment_audit_job,
+        action="ATTACHMENT_DELETED",
+        attachment_id=attachment_id,
+        task_id=attachment_id,
+        filename=result.original_filename,
+        file_size=result.file_size,
+    )
+    return result
