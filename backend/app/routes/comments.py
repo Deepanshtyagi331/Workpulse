@@ -79,7 +79,7 @@ def create_task_comment(
     "/comments/{comment_id}",
     response_model=CommentResponse,
     summary="Update Comment",
-    description="Modify the text content of an existing comment/note. Requires Bearer token.",
+    description="Modify the text content of an existing comment/note. Requires Bearer token. Users can only edit their own comments (admin can edit any).",
 )
 def update_comment(
     comment_id: int,
@@ -87,6 +87,19 @@ def update_comment(
     current_user: User = Depends(get_current_user),
     service: NoteService = Depends(get_note_service),
 ):
+    comment = service.note_repo.get_by_id(comment_id)
+    if not comment:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Comment with ID {comment_id} not found",
+        )
+    if current_user.app_role != "admin" and comment.user_id != current_user.id:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only edit your own comments.",
+        )
     return service.update_comment(comment_id=comment_id, comment_in=comment_in)
 
 
@@ -94,11 +107,24 @@ def update_comment(
     "/comments/{comment_id}",
     response_model=CommentResponse,
     summary="Delete Comment",
-    description="Remove a specific comment/note by ID. Requires Bearer token.",
+    description="Remove a specific comment/note by ID. Requires Bearer token. Users can delete their own comments; Admins can delete any comment.",
 )
 def delete_comment(
     comment_id: int,
     current_user: User = Depends(get_current_user),
     service: NoteService = Depends(get_note_service),
 ):
+    comment = service.note_repo.get_by_id(comment_id)
+    if not comment:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Comment with ID {comment_id} not found",
+        )
+    if current_user.app_role != "admin" and comment.user_id != current_user.id:
+        from fastapi import HTTPException
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only delete your own comments.",
+        )
     return service.delete_comment(comment_id=comment_id)

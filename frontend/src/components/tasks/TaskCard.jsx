@@ -71,24 +71,28 @@ export function TaskCard({
         >
           View
         </Button>
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onEdit && onEdit(task)}
-          icon={Edit2}
-          className="text-xs py-1 px-2"
-        >
-          Edit
-        </Button>
-        <Button
-          variant="danger"
-          size="sm"
-          onClick={() => onDelete && onDelete(task)}
-          icon={Trash2}
-          className="text-xs py-1 px-2"
-        >
-          Delete
-        </Button>
+        {onEdit && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onEdit(task)}
+            icon={Edit2}
+            className="text-xs py-1 px-2"
+          >
+            Edit
+          </Button>
+        )}
+        {onDelete && (
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={() => onDelete(task)}
+            icon={Trash2}
+            className="text-xs py-1 px-2"
+          >
+            Delete
+          </Button>
+        )}
       </div>
     </div>
   );

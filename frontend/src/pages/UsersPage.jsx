@@ -11,6 +11,7 @@ import ErrorState from '../components/feedback/ErrorState';
 import UserForm from '../components/users/UserForm';
 import userService from '../services/userService';
 import { DEPARTMENT_COLORS } from '../utils/constants';
+import { useAuth } from '../context/AuthContext';
 
 const DEPARTMENT_OPTIONS = [
   { value: '', label: 'All Departments' },
@@ -22,6 +23,9 @@ const DEPARTMENT_OPTIONS = [
 ];
 
 export function UsersPage() {
+  const { user: currentUser, isAdmin, isManager } = useAuth();
+  const canManageUsers = isAdmin || isManager;
+
   const [users, setUsers] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, total_pages: 1 });
   const [search, setSearch] = useState('');
@@ -129,7 +133,7 @@ export function UsersPage() {
       },
     },
     {
-      header: 'Role',
+      header: 'Job Title',
       accessor: 'role',
       render: (val) => (
         <span className="inline-flex items-center gap-1 text-xs text-slate-700 font-medium">
@@ -137,6 +141,24 @@ export function UsersPage() {
           {val || 'Member'}
         </span>
       ),
+    },
+    {
+      header: 'App Role',
+      accessor: 'app_role',
+      render: (val) => {
+        const role = val || 'employee';
+        return (
+          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-bold uppercase border ${
+            role === 'admin'
+              ? 'bg-rose-50 text-rose-700 border-rose-200'
+              : role === 'manager'
+              ? 'bg-amber-50 text-amber-700 border-amber-200'
+              : 'bg-cyan-50 text-cyan-700 border-cyan-200'
+          }`}>
+            {role}
+          </span>
+        );
+      },
     },
     {
       header: 'Status',
@@ -205,17 +227,19 @@ export function UsersPage() {
           >
             Refresh
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            icon={UserPlus}
-            onClick={() => {
-              setFormError(null);
-              setIsAddModalOpen(true);
-            }}
-          >
-            + Add User
-          </Button>
+          {canManageUsers && (
+            <Button
+              variant="primary"
+              size="sm"
+              icon={UserPlus}
+              onClick={() => {
+                setFormError(null);
+                setIsAddModalOpen(true);
+              }}
+            >
+              + Add User
+            </Button>
+          )}
         </div>
       </div>
 
@@ -312,6 +336,7 @@ export function UsersPage() {
           onCancel={() => setIsAddModalOpen(false)}
           loading={formLoading}
           error={formError}
+          isAdmin={isAdmin}
         />
       </Modal>
     </div>

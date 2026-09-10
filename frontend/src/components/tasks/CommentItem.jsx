@@ -38,6 +38,9 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
     minute: '2-digit',
   });
 
+  const canEdit = isOwner || user?.app_role === 'admin';
+  const canDelete = isOwner || user?.app_role === 'admin';
+
   const handleSave = async () => {
     const trimmed = editContent.trim();
     if (!trimmed) {
@@ -96,25 +99,29 @@ export function CommentItem({ comment, onUpdate, onDelete }) {
             <span>{formattedTime}</span>
             {isEdited && <span className="italic text-slate-400">(edited)</span>}
 
-            {/* Ownership Actions: Only show for current user's comments */}
-            {isOwner && !isEditing && (
+            {/* Ownership / Admin Actions: Edit & Delete */}
+            {(canEdit || canDelete) && !isEditing && (
               <div className="flex items-center gap-1 ml-2 border-l border-slate-200 pl-2">
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="p-1 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                  title="Edit comment"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                  <span className="sr-only">Edit</span>
-                </button>
-                <button
-                  onClick={() => onDelete(comment)}
-                  className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
-                  title="Delete comment"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span className="sr-only">Delete</span>
-                </button>
+                {canEdit && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="p-1 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                    title="Edit comment"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                    <span className="sr-only">Edit</span>
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    onClick={() => onDelete(comment)}
+                    className="p-1 text-slate-400 hover:text-rose-600 rounded transition-colors"
+                    title="Delete comment"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span className="sr-only">Delete</span>
+                  </button>
+                )}
               </div>
             )}
           </div>

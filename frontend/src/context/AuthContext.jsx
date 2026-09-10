@@ -17,6 +17,12 @@ const AuthContext = createContext({
   user: null,          // Current authenticated user or null
   isAuthenticated: false,
   isLoading: true,     // True while the initial /auth/me check is in flight
+  appRole: null,       // 'admin' | 'manager' | 'employee' | null
+  isAdmin: false,
+  isManager: false,
+  isEmployee: false,
+  hasRole: () => false,
+  hasAnyRole: () => false,
   login: async () => {},
   register: async () => {},
   logout: () => {},
@@ -109,6 +115,24 @@ export function AuthProvider({ children }) {
   }, [logout]);
 
   // -------------------------------------------------------------------------
+  // RBAC helpers
+  // -------------------------------------------------------------------------
+  const appRole = user?.app_role || null;
+  const isAdmin = appRole === 'admin';
+  const isManager = appRole === 'manager';
+  const isEmployee = appRole === 'employee';
+
+  const hasRoleCheck = useCallback(
+    (role) => appRole === role,
+    [appRole]
+  );
+
+  const hasAnyRoleCheck = useCallback(
+    (roles = []) => roles.includes(appRole),
+    [appRole]
+  );
+
+  // -------------------------------------------------------------------------
   // Context value (memoised to avoid unnecessary child re-renders)
   // -------------------------------------------------------------------------
   const value = useMemo(
@@ -116,12 +140,31 @@ export function AuthProvider({ children }) {
       user,
       isAuthenticated: Boolean(user),
       isLoading,
+      appRole,
+      isAdmin,
+      isManager,
+      isEmployee,
+      hasRole: hasRoleCheck,
+      hasAnyRole: hasAnyRoleCheck,
       login,
       register,
       logout,
       refreshUser,
     }),
-    [user, isLoading, login, register, logout, refreshUser]
+    [
+      user,
+      isLoading,
+      appRole,
+      isAdmin,
+      isManager,
+      isEmployee,
+      hasRoleCheck,
+      hasAnyRoleCheck,
+      login,
+      register,
+      logout,
+      refreshUser,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

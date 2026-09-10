@@ -14,17 +14,29 @@ const DEPARTMENT_OPTIONS = [
   { value: 'Security', label: 'Security' },
 ];
 
+const ROLE_OPTIONS_FOR_ADMIN = [
+  { value: 'employee', label: 'Employee' },
+  { value: 'manager', label: 'Manager' },
+  { value: 'admin', label: 'Admin' },
+];
+
+const ROLE_OPTIONS_FOR_MANAGER = [
+  { value: 'employee', label: 'Employee' },
+];
+
 export function UserForm({
   onSubmit,
   onCancel,
   loading = false,
   error: submitError = null,
+  isAdmin = false,
 }) {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     department: 'Engineering',
     role: '',
+    app_role: 'employee',
     is_active: true,
   });
 
@@ -85,6 +97,7 @@ export function UserForm({
       email: formData.email.trim().toLowerCase(),
       department: formData.department.trim(),
       role: formData.role.trim(),
+      app_role: formData.app_role || 'employee',
       is_active: Boolean(formData.is_active),
     });
   };
@@ -125,7 +138,7 @@ export function UserForm({
         disabled={loading}
       />
 
-      {/* Department & Role Grid */}
+      {/* Department, Job Role & App Role Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Select
           label="Department"
@@ -150,6 +163,24 @@ export function UserForm({
           required
           disabled={loading}
         />
+      </div>
+
+      {/* App Authorization Role */}
+      <div>
+        <Select
+          label="Application Role (RBAC)"
+          id="user-app-role"
+          name="app_role"
+          value={formData.app_role}
+          onChange={(e) => handleChange('app_role', e.target.value)}
+          options={isAdmin ? ROLE_OPTIONS_FOR_ADMIN : ROLE_OPTIONS_FOR_MANAGER}
+          disabled={loading}
+        />
+        <p className="text-[11px] text-slate-400 mt-1">
+          {isAdmin
+            ? 'Admins can assign employee, manager, or admin permissions.'
+            : 'Managers can create users with employee permissions.'}
+        </p>
       </div>
 
       {/* Status Toggle */}

@@ -45,6 +45,7 @@ def seed_database():
                 "email": "sarah.chen@workpulse.internal",
                 "department": "Engineering",
                 "role": "Lead Architect",
+                "app_role": "admin",
                 "is_active": True,
             },
             {
@@ -52,6 +53,7 @@ def seed_database():
                 "email": "alex.rivera@workpulse.internal",
                 "department": "Engineering",
                 "role": "Senior Backend Engineer",
+                "app_role": "manager",
                 "is_active": True,
             },
             {
@@ -59,6 +61,7 @@ def seed_database():
                 "email": "priya.patel@workpulse.internal",
                 "department": "Product",
                 "role": "Senior Product Manager",
+                "app_role": "manager",
                 "is_active": True,
             },
             {
@@ -66,6 +69,7 @@ def seed_database():
                 "email": "marcus.vance@workpulse.internal",
                 "department": "Design",
                 "role": "Staff UI/UX Designer",
+                "app_role": "employee",
                 "is_active": True,
             },
             {
@@ -73,6 +77,7 @@ def seed_database():
                 "email": "elena.rostova@workpulse.internal",
                 "department": "Operations",
                 "role": "DevOps Lead",
+                "app_role": "employee",
                 "is_active": True,
             },
             {
@@ -80,6 +85,7 @@ def seed_database():
                 "email": "david.kim@workpulse.internal",
                 "department": "Quality Assurance",
                 "role": "QA Automation Lead",
+                "app_role": "employee",
                 "is_active": True,
             },
             {
@@ -87,6 +93,7 @@ def seed_database():
                 "email": "rachel.adams@workpulse.internal",
                 "department": "Security",
                 "role": "InfoSec Analyst",
+                "app_role": "employee",
                 "is_active": True,
             },
         ]

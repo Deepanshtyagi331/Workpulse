@@ -73,3 +73,8 @@ class UserRepository(BaseRepository[User]):
             self.db.delete(user)
             self.db.commit()
         return user
+
+    def count_by_app_role(self, app_role: str) -> int:
+        """Returns the number of users with the given app_role."""
+        return self.db.query(User).filter(User.app_role == app_role).count()
+

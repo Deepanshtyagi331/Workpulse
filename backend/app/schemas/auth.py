@@ -4,15 +4,19 @@ Pydantic schemas for authentication: register, login, token response, current us
 
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
+from app.core.roles import UserAppRole
+
 
 class RegisterRequest(BaseModel):
-    """Payload for new user registration."""
+    """Payload for new user registration. New users always start as 'employee'."""
 
     name: str = Field(..., min_length=1, max_length=100, description="Full name of the team member")
     email: EmailStr = Field(..., description="Corporate email address (must be unique)")
     password: str = Field(..., min_length=8, max_length=128, description="Plaintext password (min 8 chars)")
     department: str = Field(default="Engineering", min_length=2, max_length=100)
-    role: str = Field(default="Member", min_length=2, max_length=50)
+    role: str = Field(default="Member", min_length=2, max_length=100)
+    # Self-registration always yields employee; admins can promote via PUT /api/users/{id}
+    app_role: str = Field(default=UserAppRole.EMPLOYEE.value, exclude=True)
 
 
 class LoginRequest(BaseModel):
@@ -29,7 +33,8 @@ class CurrentUserResponse(BaseModel):
     name: str
     email: EmailStr
     department: str
-    role: str
+    role: str          # Organizational job title
+    app_role: str      # Application authorization role: admin | manager | employee
     is_active: bool
     avatarText: str = ""
 

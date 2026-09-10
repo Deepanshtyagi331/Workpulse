@@ -2,6 +2,11 @@ from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
 
+from app.core.roles import UserAppRole
+
+# Valid app roles as strings
+VALID_APP_ROLES = {r.value for r in UserAppRole}
+
 
 class UserBase(BaseModel):
     name: str = Field(
@@ -23,8 +28,8 @@ class UserBase(BaseModel):
     role: str = Field(
         default="Member",
         min_length=1,
-        max_length=50,
-        description="Organizational role or title",
+        max_length=100,
+        description="Organizational job title",
     )
     is_active: bool = Field(
         default=True,
@@ -49,35 +54,31 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    pass
+    """Schema for creating a user. app_role defaults to 'employee'."""
+    app_role: str = Field(
+        default=UserAppRole.EMPLOYEE.value,
+        description="Application authorization role: admin | manager | employee",
+    )
+
+    @field_validator("app_role")
+    @classmethod
+    def validate_app_role(cls, v: str) -> str:
+        v_clean = v.strip().lower()
+        if v_clean not in VALID_APP_ROLES:
+            raise ValueError(f"app_role must be one of: {', '.join(sorted(VALID_APP_ROLES))}")
+        return v_clean
 
 
 class UserUpdate(BaseModel):
-    name: Optional[str] = Field(
+    """Schema for updating a user. All fields optional."""
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    email: Optional[EmailStr] = None
+    department: Optional[str] = Field(None, min_length=1, max_length=100)
+    role: Optional[str] = Field(None, min_length=1, max_length=100)
+    is_active: Optional[bool] = None
+    app_role: Optional[str] = Field(
         None,
-        min_length=1,
-        max_length=100,
-        description="Updated name",
-    )
-    email: Optional[EmailStr] = Field(
-        None,
-        description="Updated email address",
-    )
-    department: Optional[str] = Field(
-        None,
-        min_length=1,
-        max_length=100,
-        description="Updated department",
-    )
-    role: Optional[str] = Field(
-        None,
-        min_length=1,
-        max_length=50,
-        description="Updated role",
-    )
-    is_active: Optional[bool] = Field(
-        None,
-        description="Updated status",
+        description="Application authorization role: admin | manager | employee",
     )
 
     @field_validator("department")
@@ -100,6 +101,16 @@ class UserUpdate(BaseModel):
             return v_clean
         return v
 
+    @field_validator("app_role")
+    @classmethod
+    def validate_app_role_update(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            v_clean = v.strip().lower()
+            if v_clean not in VALID_APP_ROLES:
+                raise ValueError(f"app_role must be one of: {', '.join(sorted(VALID_APP_ROLES))}")
+            return v_clean
+        return v
+
 
 class UserSummary(BaseModel):
     """Lightweight user summary for embedding inside task and comment responses."""
@@ -108,12 +119,14 @@ class UserSummary(BaseModel):
     email: EmailStr
     department: str
     role: str
+    app_role: str
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class UserResponse(UserBase):
     id: int
+    app_role: str
     created_at: datetime
     updated_at: datetime
 

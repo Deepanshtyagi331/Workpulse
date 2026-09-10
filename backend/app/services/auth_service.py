@@ -26,6 +26,7 @@ def _to_current_user(user: User) -> CurrentUserResponse:
         email=user.email,
         department=user.department,
         role=user.role,
+        app_role=user.app_role or "employee",
         is_active=user.is_active,
         avatarText=_make_avatar_text(user.name),
     )

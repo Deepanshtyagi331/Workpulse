@@ -110,6 +110,11 @@ app.include_router(integrations_router, prefix="/api/integrations", tags=["Exter
 
 
 
+# ─── Health check routes ──────────────────────────────────────────────────────
+from app.routes.health import router as health_router
+app.include_router(health_router, prefix="/api", tags=["System Health"])
+app.include_router(health_router, tags=["System Health"], include_in_schema=False)
+
 @app.get("/", tags=["Root"])
 def root_info():
     """Root info endpoint providing service metadata."""

@@ -12,7 +12,12 @@ class User(Base, TimestampMixin):
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=True)  # Populated by auth; nullable for seeded accounts
     department = Column(String(100), nullable=False, default="Engineering")
-    role = Column(String(50), nullable=False, default="Member")
+    role = Column(String(100), nullable=False, default="Member")  # Job title / organizational role
+
+    # Application-level authorization role (admin | manager | employee)
+    # Separate from the free-text organizational 'role' above.
+    app_role = Column(String(20), nullable=False, default="employee")
+
     is_active = Column(Boolean, default=True, nullable=False)
 
     # Relationships
@@ -20,4 +25,4 @@ class User(Base, TimestampMixin):
     notes = relationship("Note", back_populates="author", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
-        return f"<User(id={self.id}, name='{self.name}', email='{self.email}')>"
+        return f"<User(id={self.id}, name='{self.name}', app_role='{self.app_role}')>"

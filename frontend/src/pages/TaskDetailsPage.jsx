@@ -34,7 +34,7 @@ import { useAuth } from '../context/AuthContext';
 export function TaskDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAdmin, isManager, isEmployee } = useAuth();
 
   // Task & Comments State
   const [task, setTask] = useState(null);
@@ -281,25 +281,29 @@ export function TaskDetailsPage() {
         </div>
 
         <div className="flex items-center gap-2.5 shrink-0 self-end sm:self-auto">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => {
-              setFormError(null);
-              setIsEditModalOpen(true);
-            }}
-            icon={Edit2}
-          >
-            Edit Task
-          </Button>
-          <Button
-            variant="danger"
-            size="sm"
-            onClick={() => setIsDeleteTaskOpen(true)}
-            icon={Trash2}
-          >
-            Delete
-          </Button>
+          {(isAdmin || isManager || (isEmployee && task.assigned_to === user?.id)) && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setFormError(null);
+                setIsEditModalOpen(true);
+              }}
+              icon={Edit2}
+            >
+              Edit Task
+            </Button>
+          )}
+          {(isAdmin || isManager) && (
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => setIsDeleteTaskOpen(true)}
+              icon={Trash2}
+            >
+              Delete
+            </Button>
+          )}
         </div>
       </div>
 
@@ -528,6 +532,7 @@ export function TaskDetailsPage() {
           onCancel={() => setIsEditModalOpen(false)}
           loading={formSubmitting}
           error={formError}
+          isEmployee={isEmployee}
         />
       </Modal>
 

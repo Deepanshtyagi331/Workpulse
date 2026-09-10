@@ -32,6 +32,7 @@ import TaskForm from '../components/tasks/TaskForm';
 
 import taskService from '../services/taskService';
 import userService from '../services/userService';
+import { useAuth } from '../context/AuthContext';
 
 const SORT_OPTIONS = [
   { value: 'created_at:desc', label: 'Newest First (Created)' },
@@ -46,6 +47,19 @@ const SORT_OPTIONS = [
 export function TasksPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user: currentUser, isAdmin, isManager, isEmployee } = useAuth();
+  const canCreateTask = isAdmin || isManager;
+  const canDeleteAnyTask = isAdmin || isManager;
+
+  const canEditTask = useCallback((task) => {
+    if (isAdmin || isManager) return true;
+    if (isEmployee) return task.assigned_to === currentUser?.id;
+    return false;
+  }, [isAdmin, isManager, isEmployee, currentUser]);
+
+  const canDeleteTask = useCallback((task) => {
+    return isAdmin || isManager;
+  }, [isAdmin, isManager]);
 
   // Tasks and metadata state
   const [tasks, setTasks] = useState([]);
@@ -289,22 +303,26 @@ export function TasksPage() {
             title="View Details"
             className="p-1.5 h-8 w-8 text-slate-500 hover:text-slate-900"
           />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setEditingTask(row)}
-            icon={Edit2}
-            title="Edit Task"
-            className="p-1.5 h-8 w-8 text-slate-500 hover:text-indigo-600"
-          />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setDeletingTask(row)}
-            icon={Trash2}
-            title="Delete Task"
-            className="p-1.5 h-8 w-8 text-slate-500 hover:text-rose-600"
-          />
+          {canEditTask(row) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setEditingTask(row)}
+              icon={Edit2}
+              title="Edit Task"
+              className="p-1.5 h-8 w-8 text-slate-500 hover:text-indigo-600"
+            />
+          )}
+          {canDeleteTask(row) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setDeletingTask(row)}
+              icon={Trash2}
+              title="Delete Task"
+              className="p-1.5 h-8 w-8 text-slate-500 hover:text-rose-600"
+            />
+          )}
         </div>
       ),
     },
@@ -349,17 +367,19 @@ export function TasksPage() {
           >
             Refresh
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => {
-              setFormError(null);
-              setIsCreateOpen(true);
-            }}
-            icon={Plus}
-          >
-            Create Task
-          </Button>
+          {canCreateTask && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => {
+                setFormError(null);
+                setIsCreateOpen(true);
+              }}
+              icon={Plus}
+            >
+              Create Task
+            </Button>
+          )}
         </div>
       </div>
 
@@ -495,8 +515,8 @@ export function TasksPage() {
                 key={task.id}
                 task={task}
                 onView={() => navigate(`/tasks/${task.id}`)}
-                onEdit={() => setEditingTask(task)}
-                onDelete={() => setDeletingTask(task)}
+                onEdit={canEditTask(task) ? () => setEditingTask(task) : undefined}
+                onDelete={canDeleteTask(task) ? () => setDeletingTask(task) : undefined}
               />
             ))}
           </div>
@@ -544,6 +564,7 @@ export function TasksPage() {
             onCancel={() => setEditingTask(null)}
             loading={formLoading}
             error={formError}
+            isEmployee={isEmployee}
           />
         )}
       </Modal>

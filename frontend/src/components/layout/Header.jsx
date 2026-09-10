@@ -109,8 +109,21 @@ export function Header({ onMenuClick, healthStatus }) {
             {avatarText}
           </div>
           <div className="hidden lg:block text-left">
-            <p className="text-xs font-semibold text-slate-900 leading-tight">{user?.name ?? '…'}</p>
-            <p className="text-[10px] text-slate-500 leading-tight truncate max-w-[100px]">{user?.role ?? ''}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-xs font-semibold text-slate-900 leading-tight">{user?.name ?? '…'}</p>
+              {user?.app_role && (
+                <span className={`px-1.5 py-0.2 text-[9px] font-bold rounded uppercase border ${
+                  user.app_role === 'admin'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                    : user.app_role === 'manager'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                }`}>
+                  {user.app_role}
+                </span>
+              )}
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight truncate max-w-[120px]">{user?.role ?? ''}</p>
           </div>
           <ChevronDown className={`hidden lg:block w-3.5 h-3.5 text-slate-400 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
         </button>
@@ -120,7 +133,20 @@ export function Header({ onMenuClick, healthStatus }) {
           <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg shadow-slate-200/50 py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-100">
             {/* User info */}
             <div className="px-3 py-2 border-b border-slate-100 mb-1">
-              <p className="text-xs font-semibold text-slate-800">{user?.name}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold text-slate-800">{user?.name}</p>
+                {user?.app_role && (
+                  <span className={`px-1.5 py-0.2 text-[9px] font-bold rounded uppercase border ${
+                    user.app_role === 'admin'
+                      ? 'bg-rose-50 text-rose-700 border-rose-200'
+                      : user.app_role === 'manager'
+                      ? 'bg-amber-50 text-amber-700 border-amber-200'
+                      : 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                  }`}>
+                    {user.app_role}
+                  </span>
+                )}
+              </div>
               <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
               <p className="text-[10px] text-slate-400 mt-0.5">{user?.department} · {user?.role}</p>
             </div>

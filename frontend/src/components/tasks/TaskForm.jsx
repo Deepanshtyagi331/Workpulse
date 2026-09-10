@@ -10,6 +10,7 @@ export function TaskForm({
   onCancel,
   loading = false,
   error: submitError = null,
+  isEmployee = false,
 }) {
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -156,21 +157,28 @@ export function TaskForm({
 
       {/* Assignee & Due Date Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Select
-          label="Assignee"
-          name="assigned_to"
-          placeholder="Unassigned"
-          value={formData.assigned_to}
-          onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
-          options={[
-            { value: '', label: 'Unassigned' },
-            ...users.map((u) => ({
-              value: u.id,
-              label: `${u.name} (${u.role || u.department || 'User'})`,
-            })),
-          ]}
-          disabled={loading || loadingUsers}
-        />
+        <div>
+          <Select
+            label="Assignee"
+            name="assigned_to"
+            placeholder="Unassigned"
+            value={formData.assigned_to}
+            onChange={(e) => setFormData({ ...formData, assigned_to: e.target.value })}
+            options={[
+              { value: '', label: 'Unassigned' },
+              ...users.map((u) => ({
+                value: u.id,
+                label: `${u.name} (${u.role || u.department || 'User'})`,
+              })),
+            ]}
+            disabled={loading || loadingUsers || isEmployee}
+          />
+          {isEmployee && (
+            <p className="text-[10px] text-slate-400 mt-1">
+              Employees cannot reassign tasks to other team members.
+            </p>
+          )}
+        </div>
 
         <div className="w-full space-y-1.5 text-left">
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700">

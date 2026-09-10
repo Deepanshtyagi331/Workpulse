@@ -88,12 +88,22 @@ export function Sidebar({ mobileOpen = false, setMobileOpen }) {
             {avatarText}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold text-slate-900 truncate">{user?.name ?? '…'}</p>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center justify-between gap-1">
+              <p className="text-xs font-semibold text-slate-900 truncate">{user?.name ?? '…'}</p>
+              {user?.app_role && (
+                <span className={`px-1 py-0.2 text-[8px] font-bold rounded uppercase border shrink-0 ${
+                  user.app_role === 'admin'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200'
+                    : user.app_role === 'manager'
+                    ? 'bg-amber-50 text-amber-700 border-amber-200'
+                    : 'bg-cyan-50 text-cyan-700 border-cyan-200'
+                }`}>
+                  {user.app_role}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 mt-0.5">
               <span className="text-[10px] text-slate-500 truncate">{user?.role ?? ''}</span>
-              <span className="inline-block px-1 py-0.2 text-[9px] font-bold bg-emerald-100 text-emerald-800 rounded">
-                Authenticated
-              </span>
             </div>
           </div>
         </div>
